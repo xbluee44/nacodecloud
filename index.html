@@ -231,7 +231,7 @@ function bindShell() {
 /* ---------- pages ---------- */
 function pageAuth(mode) {
   const reg = mode === 'register';
-  const needSrv = !API && /vercel\.app$/.test(location.hostname);
+  const needSrv = !API && !/^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(location.hostname);
   $('#app').innerHTML = `<div class="authbox">
     <div class="logo"><i>N</i><span>NAcode<b>Cloud</b></span></div>
     <p class="sub">${reg ? 'Buat akun untuk mulai membuat bot WhatsApp.' : 'Masuk untuk mengelola bot WhatsApp kamu.'}</p>
@@ -246,7 +246,7 @@ function pageAuth(mode) {
     </form>
     <p class="sub" style="margin:16px 0 0"><a href="#/portfolio">★ Lihat portofolio kammx</a></p>
     <details class="srv" ${needSrv ? 'open' : ''}><summary>Pengaturan server</summary>
-      <p class="hint" style="margin:0 0 8px">Alamat backend bot (contoh: https://xxxx.trycloudflare.com). Kosongkan bila web dibuka dari server bot, misalnya http://localhost:3000.</p>
+      <p class="hint" style="margin:0 0 8px">Alamat backend bot yang jalan di Termux, contoh https://xxxx.trycloudflare.com (buat dengan cloudflared). Kosongkan bila web dibuka langsung dari server bot, misalnya http://localhost:3000.</p>
       <input id="srv" class="mono" inputmode="url" autocapitalize="off" placeholder="https://..." value="${esc(API)}">
       <div style="height:10px"></div><button type="button" class="btn ghost" id="srvSave">Simpan alamat server</button></details></div>`;
   const err = (t) => { $('#aerr').textContent = t || ''; };
@@ -254,6 +254,7 @@ function pageAuth(mode) {
   $('#srvSave').onclick = () => {
     const v = $('#srv').value.trim().replace(/\/$/, '');
     if (v && !/^https?:\/\//.test(v)) return err('Alamat server harus diawali http:// atau https://');
+    if (v && location.protocol === 'https:' && /^http:\/\//.test(v) && !/^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(v)) return err('Web ini https, jadi alamat server juga harus https. Di Termux jalankan: cloudflared tunnel --url http://localhost:3000');
     v ? localStorage.setItem('na_api', v) : localStorage.removeItem('na_api');
     API = v || (window.NACODE_API || '').replace(/\/$/, ''); err(''); toast('Alamat server disimpan');
   };
