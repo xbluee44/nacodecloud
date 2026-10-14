@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NAcodeCloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="countries.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#070809;--card:#101214;--card2:#16191c;--line:#23282d;--txt:#e9ecef;--mut:#80888f;--g:#22c55e;--gd:#0f3d22;--red:#ef4444;--yel:#f5c542;--blue:#7c8cff;--r:20px}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 24px)}
+code,pre,.mono,input.mono,textarea.mono{font-family:"JetBrains Mono",monospace}
+a{color:var(--g);text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto}
+/* header */
+.top{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:20;display:flex;align-items:center;justify-content:space-between;background:rgba(7,8,9,.9);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:10px 12px 10px 18px;margin-bottom:22px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.3px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--g);color:#04130a;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:15px}
+.logo b{color:var(--g)}
+.ibtn{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center}
+.badge{font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid}
+.b-new{color:var(--yel);border-color:#5b4a10;background:#2a2208}
+.b-dev{color:#8ab4ff;border-color:#27406e;background:#101c33}
+/* drawer */
+.drawer{position:fixed;inset:0;z-index:30;display:none}
+.drawer.on{display:block}
+.drawer .sh{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.drawer nav{position:absolute;right:14px;top:calc(env(safe-area-inset-top,0px) + 80px);width:min(320px,calc(100% - 28px));background:#0c0e10;border:1px solid var(--line);border-radius:24px;padding:14px;max-height:calc(100% - 110px);overflow:auto}
+.who{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px}
+.who small{display:block;color:var(--mut);font-size:12px}
+.nav-i{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:13px 10px;font-weight:600;text-align:left;border-radius:12px}
+.nav-i:hover{background:var(--card)}
+.nav-i .ic{width:22px;text-align:center}
+.out{margin-top:8px;width:100%;padding:14px;border-radius:16px;border:1px solid #4a1d1d;background:#1d0e0e;color:#f87171;font-weight:700}
+/* cards */
+h1{font-size:30px;line-height:1.15;font-weight:800;letter-spacing:-.6px;text-align:center}
+h1 b{color:var(--g)}
+.sub{color:var(--mut);text-align:center;margin:8px 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.card h3{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);font-weight:700;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat small{display:block;color:var(--mut);font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.stat strong{font-size:19px}
+.g{color:var(--g)}
+.bar{height:5px;background:var(--line);border-radius:9px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--g)}
+.welcome{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.av{width:64px;height:64px;border-radius:50%;background:#6ca13a;display:grid;place-items:center;font-size:28px;font-weight:600;border:3px solid var(--g);flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:600;font-size:14px}
+/* forms */
+label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+label small{font-weight:400;color:var(--mut)}
+input,textarea,select{width:100%;background:#0a0b0c;border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:14px 16px;font:inherit;font-size:16px}
+textarea{resize:vertical;min-height:90px}
+input:focus,textarea:focus,select:focus{border-color:var(--g);outline:0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:14px;border:0;background:var(--g);color:#04130a;font-weight:800;letter-spacing:.4px}
+.btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600;letter-spacing:0}
+.btn.warn{background:#2a2208;color:var(--yel);border:1px solid #5b4a10}
+.btn.ind{background:#161a35;color:#a5b0ff;border:1px solid #2a3170}
+.btn:disabled{opacity:.55}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.seg button{padding:13px;border-radius:14px;border:1px solid var(--line);background:#0a0b0c;color:var(--mut);font-weight:600}
+.seg button.on{border-color:var(--g);color:var(--g);background:#0b1a11}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:16px 0;font-size:14px}
+.chk input{width:20px;height:20px;flex:none;accent-color:var(--g);margin-top:2px}
+/* status */
+.kv{display:flex;justify-content:space-between;padding:6px 0}
+.kv span{color:var(--mut)}
+.st{font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px;background:var(--card2);color:var(--mut)}
+.st.online{background:#0b2515;color:var(--g)}
+.st.waiting_scan{background:#2a2208;color:var(--yel)}
+.st.connecting{background:#161a35;color:#a5b0ff}
+/* terminal */
+.term{background:#0a0c0e;border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.term .hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--mut)}
+.dot{width:10px;height:10px;border-radius:50%}
+.term .bd{padding:22px;text-align:center;min-height:160px;display:grid;place-items:center;color:var(--mut)}
+.term pre{padding:14px 16px;font-size:12px;color:#8b949e;white-space:pre-wrap;max-height:200px;overflow:auto;border-top:1px solid var(--line)}
+.code{font-size:34px;font-weight:700;letter-spacing:4px;color:var(--g);font-family:"JetBrains Mono",monospace}
+#qr{background:#fff;padding:12px;border-radius:12px;display:inline-block}
+/* docs */
+.cb{position:relative;background:#0a0b0c;border:1px solid var(--line);border-radius:14px;padding:16px;font-size:13px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.cb .cp{position:absolute;top:10px;right:10px;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:13px}
+.pr{padding:14px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:100px 1fr;gap:6px 14px}
+.pr:first-of-type{border-top:0}
+.pr code{color:#f472b6}
+.tag{font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;background:#2b2f35;margin-right:6px}
+.tag.req{background:#3a1515;color:#f87171;border:1px solid #6b2323}
+.method{font-size:12px;font-weight:800;padding:4px 10px;border-radius:8px;background:#161a35;color:#a5b0ff;border:1px solid #2a3170}
+.err div{display:flex;justify-content:space-between;padding:5px 0}
+.keybox{display:flex;align-items:center;background:#0a0b0c;border:1px solid var(--line);border-radius:14px;padding:0 6px 0 16px}
+.keybox input{border:0;background:none;padding:14px 0;font-size:14px}
+.keybox button{background:none;border:0;padding:10px;font-size:18px}
+/* playground */
+.cmd{background:#0a0b0c;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px}
+.cmd .h{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.cmd .h span{color:var(--g);font-weight:800;font-size:18px}
+.cmd .h input{padding:10px 12px}
+.cmd textarea{min-height:70px}
+.x{background:#1d0e0e;border:1px solid #4a1d1d;color:#f87171;border-radius:12px;width:44px;height:44px;flex:none}
+.chat{background:#0b141a;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.chat .msgs{height:300px;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:82%;padding:9px 13px;border-radius:14px;white-space:pre-wrap;word-break:break-word;font-size:14px}
+.m.me{align-self:flex-end;background:#005c4b;border-top-right-radius:4px}
+.m.bot{align-self:flex-start;background:#202c33;border-top-left-radius:4px}
+.chat form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:#111b21}
+.chat form input{border-radius:999px}
+.chat form button{width:48px;border-radius:50%;border:0;background:var(--g);color:#04130a;font-weight:800;flex:none}
+/* modal / toast */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.7);display:none;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 14px 30px}
+.modal.on{display:block}
+.modal .card{max-width:560px;margin:0 auto}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateX(-50%);background:#e9ecef;color:#0a0b0c;padding:12px 20px;border-radius:14px;font-weight:600;z-index:60;max-width:90%;display:none}
+.toast.on{display:block}
+.toast.bad{background:#fecaca}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+footer{text-align:center;color:var(--mut);font-size:13px;margin-top:30px}
+.authbox{max-width:420px;margin:8vh auto 0}
+.authbox .logo{justify-content:center;font-size:26px;margin-bottom:6px}
+.authbox .logo i{width:42px;height:42px;font-size:22px;border-radius:12px}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .2s}@keyframes up{from{opacity:0;transform:translate(-50%,8px)}}}
+.aerr{color:#f87171;font-size:14px;min-height:20px;margin:10px 0 12px}
+details.srv{margin-top:18px;color:var(--mut);font-size:14px}
+details.srv summary{cursor:pointer;padding:6px 0}
+.keybox:focus-within{border-color:var(--g)}
+.keybox input{font-size:16px}
+.hint{color:var(--mut);font-size:13px;margin-top:6px}
+
+/* portfolio */
+.pf-hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;padding:34px 18px 28px;text-align:center;background:radial-gradient(120% 90% at 50% -10%,#0f3d22 0%,#0a0d0b 58%);margin-bottom:14px}
+.pf-orb{position:absolute;width:260px;height:260px;border-radius:50%;filter:blur(64px);opacity:.32;pointer-events:none}
+.pf-orb.a{background:#22c55e;top:-100px;left:-70px}.pf-orb.b{background:#7c8cff;bottom:-120px;right:-80px}
+.pf-av{position:relative;width:108px;height:108px;margin:0 auto 14px;border-radius:50%}
+.pf-av::before{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#22c55e,#7c8cff,#f472b6,#22c55e)}
+.pf-av span{position:absolute;inset:4px;border-radius:50%;background:#0a0b0c;display:grid;place-items:center;font-size:50px;font-weight:800;color:var(--g)}
+.pf-name{position:relative;font-size:44px;line-height:1;font-weight:800;letter-spacing:-1.5px}
+.pf-name b{background:linear-gradient(90deg,#22c55e,#7c8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pf-role{position:relative;height:30px;margin:10px 0 6px;color:#a5b0ff;font-weight:700;font-size:18px}
+.pf-role::after{content:'▌';color:var(--g);margin-left:2px}
+.pf-bio{position:relative;color:var(--mut);max-width:460px;margin:0 auto 20px}
+.pf-cta{position:relative;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pf-cta a{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:14px;font-weight:700}
+.pf-cta .p{background:var(--g);color:#04130a}.pf-cta .s{background:var(--card2);border:1px solid var(--line);color:var(--txt)}
+.pf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pf-stats div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 8px;text-align:center}
+.pf-stats b{display:block;font-size:26px;color:var(--g);letter-spacing:-.5px}
+.pf-stats small{color:var(--mut);font-size:12px}
+.pf-h{font-size:12px;letter-spacing:.9px;text-transform:uppercase;color:var(--mut);font-weight:700;margin:22px 4px 10px}
+.pf-chips{display:flex;flex-wrap:wrap;gap:8px}
+.pf-chip{padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:14px}
+.pf-grid{display:grid;gap:12px}
+.pf-card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 18px 16px;overflow:hidden;transition:transform .2s,border-color .2s}
+.pf-card::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:var(--acc,var(--g))}
+.pf-card:hover{transform:translateY(-3px);border-color:#34404a}
+.pf-card h3{font-size:18px;margin:0 0 6px}
+.pf-card p{color:var(--mut);font-size:14px;margin-bottom:12px}
+.pf-tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--mut);margin:0 6px 6px 0}
+.pf-contact{text-align:center;background:linear-gradient(160deg,#0f2a1b,#101214);border:1px solid #1d4a31;border-radius:24px;padding:26px 18px}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:no-preference){.pf-av::before{animation:spinr 7s linear infinite}.pf-role::after{animation:blink 1s steps(1) infinite}@keyframes spinr{to{transform:rotate(360deg)}}.pf-orb{animation:flo 9s ease-in-out infinite alternate}@keyframes flo{to{transform:translate(30px,24px)}}}
+.tg-st{display:flex;align-items:center;gap:10px}
+.tg-dot{width:10px;height:10px;border-radius:50%;background:#555}.tg-dot.online{background:var(--g);box-shadow:0 0 10px var(--g)}.tg-dot.connecting{background:var(--yel)}.tg-dot.error{background:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+let API = (localStorage.getItem('na_api') || window.NACODE_API || '').replace(/\/$/, '');
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let token = localStorage.getItem('na_token');
+let me = null, poll = null, cmds = [];
+
+function toast(msg, bad) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (bad ? ' bad' : '');
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = 'toast'), 2800);
+}
+async function api(path, { method = 'GET', body } = {}) {
+  const h = { 'Content-Type': 'application/json' };
+  if (token) h.Authorization = 'Bearer ' + token;
+  let r;
+  try { r = await fetch(API + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); }
+  catch { throw new Error('Tidak bisa terhubung ke server. Cek NACODE_API di config.js dan pastikan backend aktif.'); }
+  let d = {}; try { d = await r.json(); } catch {}
+  if (!r.ok) { if (r.status === 401 && token) logout(true); throw new Error(d.error || 'Error ' + r.status); }
+  return d;
+}
+function logout(silent) { token = null; localStorage.removeItem('na_token'); if (!silent) toast('Kamu sudah keluar'); location.hash = '#/login'; }
+async function copy(text) { try { await navigator.clipboard.writeText(text); toast('Tersalin'); } catch { toast('Gagal menyalin', true); } }
+
+/* ---------- layout ---------- */
+function shell(inner) {
+  return `
+  <header class="top">
+    <div class="logo"><i>N</i><span>NAcode<b>Cloud</b></span></div>
+    <button class="ibtn" id="menuBtn" aria-label="Menu">☰</button>
+  </header>
+  <div class="drawer" id="drawer"><div class="sh" id="sh"></div><nav>
+    <div class="who"><small>Masuk sebagai</small><b>${esc(me?.name || '')}</b></div>
+    <button class="nav-i" data-go="dashboard"><span class="ic">◉</span>Dashboard</button>
+    <button class="nav-i" data-go="playground"><span class="ic">✎</span>Playground Menu <span class="badge b-new">NEW</span></button>
+    <button class="nav-i" data-go="groups"><span class="ic">⚙</span>Setup Grup</button>
+    <button class="nav-i" data-go="telegram"><span class="ic">✈</span>Bot Telegram <span class="badge b-new">NEW</span></button>
+    <button class="nav-i" data-go="api-docs"><span class="ic">▤</span>Dokumentasi API <span class="badge b-dev">DEV</span></button>
+    <button class="nav-i" data-go="portfolio"><span class="ic">★</span>Portofolio kammx</button>
+    <button class="nav-i" data-go="profile"><span class="ic">☺</span>Akun Saya</button>
+    <button class="out" id="outBtn">Keluar</button>
+  </nav></div>
+  ${inner}
+  <footer>© 2026 NAcodeCloud · dibuat oleh <a href="#/portfolio">kammx</a></footer>`;
+}
+function bindShell() {
+  const d = $('#drawer');
+  $('#menuBtn').onclick = () => d.classList.toggle('on');
+  $('#sh').onclick = () => d.classList.remove('on');
+  document.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => { d.classList.remove('on'); location.hash = '#/' + b.dataset.go; }));
+  $('#outBtn').onclick = () => logout();
+}
+
+/* ---------- pages ---------- */
+function pageAuth(mode) {
+  const reg = mode === 'register';
+  const needSrv = !API && /vercel\.app$/.test(location.hostname);
+  $('#app').innerHTML = `<div class="authbox">
+    <div class="logo"><i>N</i><span>NAcode<b>Cloud</b></span></div>
+    <p class="sub">${reg ? 'Buat akun untuk mulai membuat bot WhatsApp.' : 'Masuk untuk mengelola bot WhatsApp kamu.'}</p>
+    <form class="card" id="af" novalidate>
+      <label for="em" style="margin-top:0">Email</label>
+      <input id="em" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="nama@email.com">
+      <label for="pw">Password</label>
+      <div class="keybox"><input id="pw" name="password" type="password" autocomplete="${reg ? 'new-password' : 'current-password'}" enterkeyhint="go" placeholder="Minimal 6 karakter"><button type="button" id="pwEye" aria-label="Tampilkan password">👁</button></div>
+      <p class="aerr" id="aerr" role="alert"></p>
+      <button class="btn" type="submit" id="go">${reg ? 'Daftar' : 'Masuk'}</button>
+      <p class="sub" style="margin:16px 0 0">${reg ? 'Sudah punya akun? <a href="#/login" id="swap">Masuk</a>' : 'Belum punya akun? <a href="#/register" id="swap">Daftar</a>'}</p>
+    </form>
+    <p class="sub" style="margin:16px 0 0"><a href="#/portfolio">★ Lihat portofolio kammx</a></p>
+    <details class="srv" ${needSrv ? 'open' : ''}><summary>Pengaturan server</summary>
+      <p class="hint" style="margin:0 0 8px">Alamat backend bot (contoh: https://xxxx.trycloudflare.com). Kosongkan bila web dibuka dari server bot, misalnya http://localhost:3000.</p>
+      <input id="srv" class="mono" inputmode="url" autocapitalize="off" placeholder="https://..." value="${esc(API)}">
+      <div style="height:10px"></div><button type="button" class="btn ghost" id="srvSave">Simpan alamat server</button></details></div>`;
+  const err = (t) => { $('#aerr').textContent = t || ''; };
+  $('#pwEye').onclick = () => { const p = $('#pw'); p.type = p.type === 'password' ? 'text' : 'password'; };
+  $('#srvSave').onclick = () => {
+    const v = $('#srv').value.trim().replace(/\/$/, '');
+    if (v && !/^https?:\/\//.test(v)) return err('Alamat server harus diawali http:// atau https://');
+    v ? localStorage.setItem('na_api', v) : localStorage.removeItem('na_api');
+    API = v || (window.NACODE_API || '').replace(/\/$/, ''); err(''); toast('Alamat server disimpan');
+  };
+  $('#af').onsubmit = async (e) => {
+    e.preventDefault(); err('');
+    const email = $('#em').value.trim(), pw = $('#pw').value;
+    if (!email || !pw) return err('Isi email dan password.');
+    const b = $('#go'); b.disabled = true; b.textContent = 'Memproses...';
+    try {
+      const d = await api(reg ? '/app/register' : '/app/login', { method: 'POST', body: { email, password: pw } });
+      token = d.token; localStorage.setItem('na_token', token); location.hash = '#/dashboard';
+    } catch (er) { err(er.message); b.disabled = false; b.textContent = reg ? 'Daftar' : 'Masuk'; }
+  };
+}
+
+const STL = { idle: 'IDLE', connecting: 'CONNECTING', waiting_scan: 'MENUNGGU', online: 'ONLINE' };
+
+async function pageDashboard() {
+  me = await api('/app/me');
+  const exp = new Date(me.expiresAt).toLocaleDateString('id-ID');
+  const pct = Math.min(100, (me.usageToday / me.dailyLimit) * 100);
+  $('#app').innerHTML = shell(`
+    <div class="card">
+      <div class="welcome"><div class="av">${esc(me.name[0].toUpperCase())}</div>
+      <div><div class="sub" style="margin:0;text-align:left">Selamat datang,</div><h2 style="font-size:24px">${esc(me.name)}</h2></div></div>
+      <div class="row" style="flex-wrap:wrap"><button class="pill" data-go="playground">✎ Playground Menu</button><button class="pill" data-go="api-docs">▤ API</button><button class="pill" data-go="telegram">✈ Telegram</button></div>
+    </div>
+    <div class="grid">
+      <div class="stat"><small>Status paket</small><strong>${new Date(me.expiresAt) > Date.now() ? 'Aktif' : 'Habis'}</strong></div>
+      <div class="stat"><small>Tipe paket</small><strong class="g">${esc(me.plan)}</strong></div>
+      <div class="stat"><small>Masa aktif</small><strong>${exp}</strong></div>
+      <div class="stat"><small>Command hari ini</small><strong>${me.usageToday} / ${me.dailyLimit.toLocaleString('id-ID')}</strong><div class="bar"><i style="width:${pct}%"></i></div></div>
+    </div>
+    <div class="card"><h3>Status koneksi</h3>
+      <div class="kv"><span>Nomor bot</span><b class="mono" id="sNum">-</b></div>
+      <div class="kv"><span>Koneksi</span><b class="st" id="sSt">IDLE</b></div>
+      <div class="kv"><span>Mode bot</span><select id="modeSel" style="width:auto;padding:8px 12px;font-size:14px"><option value="public">Public (semua orang)</option><option value="self">Self (hanya owner)</option></select></div>
+      <div class="kv"><span>Menu tombol</span><select id="btnSel" style="width:auto;padding:8px 12px;font-size:14px"><option value="1">Aktif</option><option value="0">Mati (teks)</option></select></div>
+      <div style="height:12px"></div>
+      <button class="btn" id="openConnect">Buka panel koneksi</button>
+      <div style="height:10px"></div>
+      <button class="btn ghost" id="disc" style="display:none">Putuskan bot</button>
+    </div>
+    <div class="term"><div class="hd"><span class="dot" style="background:#c0392b"></span><span class="dot" style="background:#27ae60"></span><span class="mono">log_sesi_whatsapp</span></div>
+      <div class="bd" id="termBody">QR atau kode pairing akan muncul di sini.</div>
+      <pre class="mono" id="logs"># Menunggu koneksi...</pre></div>
+    <div class="modal" id="modal"><div class="card">
+      <div class="row" style="align-items:center"><h2 style="font-size:20px;flex:1">Hubungkan bot WhatsApp</h2><button class="ibtn" id="mClose" style="flex:none;width:40px;height:40px">✕</button></div>
+      <label for="ccq">Negara</label>
+      <input id="ccq" placeholder="Cari negara atau kode..." autocomplete="off" style="margin-bottom:8px">
+      <select id="cc" size="1"></select>
+      <label for="num">Nomor WhatsApp bot <small>(tanpa kode negara dan tanpa 0 di depan)</small></label>
+      <input id="num" class="mono" inputmode="numeric" autocomplete="off" placeholder="82310257079">
+      <p class="hint mono" id="full"></p>
+      <label>Metode koneksi</label>
+      <div class="row seg"><button class="on" data-m="qr">QR Code</button><button data-m="pairing">Pairing Code</button></div>
+      <div class="chk"><input type="checkbox" id="tos"><span>Saya paham memakai bot punya risiko pembatasan dari WhatsApp. Sebaiknya pakai nomor cadangan.</span></div>
+      <button class="btn" id="startConn">MULAI HUBUNGKAN</button>
+    </div></div>`);
+  bindShell();
+  $('#modeSel').value = me.mode;
+  $('#btnSel').value = me.buttons ? '1' : '0';
+  $('#btnSel').onchange = async (e) => { try { await api('/app/settings', { method: 'PUT', body: { buttons: e.target.value === '1' } }); toast('Menu tombol: ' + (e.target.value === '1' ? 'aktif' : 'mati')); } catch (er) { toast(er.message, true); } };
+  $('#modeSel').onchange = async (e) => { try { await api('/app/mode', { method: 'PUT', body: { mode: e.target.value } }); toast('Mode: ' + e.target.value); } catch (er) { toast(er.message, true); } };
+  document.querySelectorAll('.pill[data-go]').forEach((b) => (b.onclick = () => (location.hash = '#/' + b.dataset.go)));
+  let method = 'qr';
+  const modal = $('#modal');
+  const cc = $('#cc');
+  const fillCc = (q = '') => {
+    q = q.trim().toLowerCase().replace(/^\+/, '');
+    const list = [...COUNTRIES].sort((a, b) => (a.iso === 'ID' ? -1 : b.iso === 'ID' ? 1 : a.name.localeCompare(b.name))).filter((c) => !q || c.name.toLowerCase().includes(q) || c.dial.startsWith(q) || c.iso.toLowerCase() === q);
+    const keep = cc.value;
+    cc.innerHTML = list.map((c) => `<option value="${c.iso}">${c.flag} ${esc(c.name)} (+${c.dial})</option>`).join('') || '<option value="">Negara tidak ditemukan</option>';
+    if (list.some((c) => c.iso === keep)) cc.value = keep;
+  };
+  fillCc();
+  const fullNum = () => {
+    const c = COUNTRIES.find((x) => x.iso === cc.value); if (!c) return '';
+    let d = $('#num').value.replace(/\D/g, '').replace(/^0+/, '');
+    if (c.dial.length >= 2 && d.startsWith(c.dial) && d.length - c.dial.length >= 8) d = d.slice(c.dial.length);
+    return d ? c.dial + d : '';
+  };
+  const showFull = () => { const f = fullNum(); $('#full').textContent = f ? 'Nomor lengkap: +' + f : ''; };
+  $('#ccq').oninput = (e) => { fillCc(e.target.value); showFull(); };
+  cc.onchange = showFull; $('#num').oninput = showFull;
+  $('#openConnect').onclick = () => modal.classList.add('on');
+  $('#mClose').onclick = () => modal.classList.remove('on');
+  document.querySelectorAll('.seg button').forEach((b) => (b.onclick = () => {
+    method = b.dataset.m; document.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b));
+  }));
+  $('#startConn').onclick = async () => {
+    const f = fullNum();
+    if (f.length < 8 || f.length > 15) return toast('Nomor tidak valid. Pilih negara lalu isi nomor tanpa 0 di depan.', true);
+    if (!$('#tos').checked) return toast('Centang persetujuan dulu', true);
+    const b = $('#startConn'); b.disabled = true;
+    try {
+      await api('/app/bot/connect', { method: 'POST', body: { number: fullNum(), method } });
+      modal.classList.remove('on'); toast(method === 'pairing' ? 'Menyiapkan kode pairing...' : 'Menyiapkan QR...'); tick();
+    } catch (e) { toast(e.message, true); }
+    b.disabled = false;
+  };
+  $('#disc').onclick = async () => {
+    if (!confirm('Putuskan bot dan hapus sesi WhatsApp?')) return;
+    try { await api('/app/bot/disconnect', { method: 'POST' }); toast('Bot diputuskan'); tick(); } catch (e) { toast(e.message, true); }
+  };
+  let lastQr = null;
+  async function tick() {
+    try {
+      const s = await api('/app/bot/status');
+      $('#sNum').textContent = s.number && s.number !== 'auto' ? s.number : (s.number ? 'tersimpan' : '-');
+      const st = $('#sSt'); st.textContent = STL[s.status] || s.status; st.className = 'st ' + s.status;
+      $('#disc').style.display = s.status === 'idle' ? 'none' : 'flex';
+      const body = $('#termBody');
+      if (s.pairing) { body.innerHTML = `<div><div class="code">${esc(s.pairing)}</div><p style="margin-top:10px">Buka WhatsApp → Perangkat tertaut → Tautkan dengan nomor telepon, lalu masukkan kode ini.</p></div>`; lastQr = null; }
+      else if (s.qr) {
+        if (s.qr !== lastQr) { body.innerHTML = '<div id="qr"></div>'; new QRCode($('#qr'), { text: s.qr, width: 220, height: 220 }); lastQr = s.qr; }
+      } else if (s.status === 'online') { body.innerHTML = '<div class="g" style="font-weight:700;font-size:18px">Bot online ✓<p style="color:var(--mut);font-weight:400;font-size:14px">Coba kirim .menu ke nomor bot.</p></div>'; lastQr = null; }
+      else if (s.status === 'idle') { body.textContent = 'QR atau kode pairing akan muncul di sini.'; lastQr = null; }
+      else if (s.status === 'connecting') { body.textContent = 'Menghubungkan...'; }
+      $('#logs').textContent = s.logs.length ? s.logs.join('\n') : '# Menunggu koneksi...';
+    } catch {}
+  }
+  tick(); poll = setInterval(tick, 2500);
+}
+
+function curl(body) {
+  return `curl -X POST ${API || location.origin.replace(/\/$/, '')}/api/sendMessage \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(body)}'`;
+}
+async function pageDocs() {
+  me = await api('/app/me');
+  const base = API || location.origin;
+  const c1 = curl({ numberJid: '628123456789', caption: 'Halo dari API!' });
+  const c2 = curl({ numberJid: '628123456789', caption: 'Lihat gambar ini', media: 'https://example.com/img.jpg' });
+  $('#app').innerHTML = shell(`
+    <p class="sub" style="margin-bottom:4px"><span class="badge b-dev">DEVELOPER</span></p>
+    <h1 style="text-align:left;font-size:26px">Dokumentasi API</h1>
+    <p class="sub" style="text-align:left">Kirim pesan dari aplikasi apa pun lewat bot WhatsApp yang sudah terhubung. Semua request memakai API key.</p>
+    <div class="card"><h3>API key kamu</h3>
+      <div class="keybox"><input id="key" class="mono" readonly type="password" value="${esc(me.apiKey)}"><button id="eye" aria-label="Tampilkan">👁</button></div>
+      <div style="height:12px"></div>
+      <div class="row"><button class="btn ghost" id="cpKey">Salin</button><button class="btn warn" id="regen">Buat ulang</button></div>
+    </div>
+    <div class="card"><h3>Base URL</h3><div class="cb mono" style="color:var(--g)">${esc(base)}</div></div>
+    <div class="card"><h3>Autentikasi</h3><p style="margin-bottom:10px;color:var(--mut)">Sertakan API key di setiap request lewat header:</p><div class="cb mono">Authorization: Bearer YOUR_API_KEY</div></div>
+    <div class="card"><h3>Rate limit</h3>
+      <div class="kv"><span>Request per menit</span><b>10</b></div><div class="kv"><span>Per</span><b>API key</b></div><div class="kv"><span>Status saat kena limit</span><b style="color:#f87171">429</b></div></div>
+    <div class="card err"><h3>Kode respons</h3>
+      <div><b class="g">200</b><span>Sukses</span></div><div><b style="color:var(--yel)">400</b><span>Parameter salah</span></div><div><b style="color:#f87171">401</b><span>API key tidak valid</span></div>
+      <div><b style="color:#fb923c">429</b><span>Kena rate limit</span></div><div><b style="color:#f87171">503</b><span>Bot tidak aktif</span></div><div><b style="color:#f87171">500</b><span>Error server</span></div></div>
+    <div class="card"><div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><span class="method">POST</span><b class="mono">/api/sendMessage</b></div>
+      <p style="color:var(--mut)">Kirim pesan teks atau gambar ke satu nomor WhatsApp lewat bot yang terhubung ke akunmu.</p></div>
+    <div class="card"><h3>Parameter (JSON body)</h3>
+      <div class="pr"><code>numberJid</code><div><span class="tag req">WAJIB</span><span class="mono" style="color:var(--mut)">string</span><p>Nomor tujuan lengkap dengan kode negara, angka saja tanpa + atau tanda hubung. Contoh: <code>628123456789</code>. 8 sampai 15 digit.</p></div></div>
+      <div class="pr"><code>caption</code><div><span class="tag">OPSIONAL*</span><span class="mono" style="color:var(--mut)">string</span><p>Teks pesan. Wajib diisi jika tidak ada <code>media</code>.</p></div></div>
+      <div class="pr"><code>media</code><div><span class="tag">OPSIONAL*</span><span class="mono" style="color:var(--mut)">string (URL)</span><p>URL gambar, harus diawali https://. Wajib diisi jika tidak ada <code>caption</code>.</p></div></div>
+      <p style="color:var(--mut);font-size:13px;margin-top:6px">* Isi minimal salah satu: caption atau media.</p></div>
+    <div class="card"><h3>Contoh request</h3>
+      <p style="color:var(--mut);margin-bottom:8px">Teks saja:</p><div class="cb mono">${esc(c1)}<button class="cp" data-c="0">Salin</button></div>
+      <p style="color:var(--mut);margin:14px 0 8px">Dengan gambar:</p><div class="cb mono">${esc(c2)}<button class="cp" data-c="1">Salin</button></div></div>
+    <div class="card"><h3>Respons sukses (200)</h3><div class="cb mono">{ "success": true, "data": [{ "messages": "Success sendMessage: user 628123456789 receive a new messages", "media": false }] }</div></div>
+    <div class="card"><h3>Coba langsung</h3>
+      <label style="margin-top:0">numberJid</label><input id="tNum" class="mono" inputmode="numeric" value="628123456789">
+      <label>caption <small>(boleh multi-baris)</small></label><textarea id="tCap" class="mono">Halo dari API!
+Baris kedua</textarea>
+      <label>media <small>(URL, opsional)</small></label><input id="tMed" class="mono" placeholder="https://...">
+      <div style="height:16px"></div><button class="btn ind" id="tGo">▶ Kirim request</button>
+      <div class="cb mono" id="tOut" style="margin-top:14px;display:none"></div></div>`);
+  bindShell();
+  $('#eye').onclick = () => { const k = $('#key'); k.type = k.type === 'password' ? 'text' : 'password'; };
+  $('#cpKey').onclick = () => copy(me.apiKey);
+  $('#regen').onclick = async () => {
+    if (!confirm('API key lama akan berhenti berfungsi. Lanjutkan?')) return;
+    try { const d = await api('/app/regenerate-key', { method: 'POST' }); me.apiKey = d.apiKey; $('#key').value = d.apiKey; toast('API key baru dibuat'); } catch (e) { toast(e.message, true); }
+  };
+  document.querySelectorAll('.cp').forEach((b) => (b.onclick = () => copy([c1, c2][b.dataset.c].replace('YOUR_API_KEY', me.apiKey))));
+  $('#tGo').onclick = async () => {
+    const body = { numberJid: $('#tNum').value.trim() }; const cap = $('#tCap').value, med = $('#tMed').value.trim();
+    if (cap) body.caption = cap; if (med) body.media = med;
+    const out = $('#tOut'); out.style.display = 'block'; out.textContent = 'Mengirim...';
+    try {
+      const r = await fetch(base + '/api/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + me.apiKey }, body: JSON.stringify(body) });
+      out.textContent = r.status + '\n' + JSON.stringify(await r.json(), null, 2);
+    } catch (e) { out.textContent = 'Gagal terhubung ke server.'; }
+  };
+}
+
+async function pagePlayground() {
+  me = await api('/app/me');
+  cmds = me.commands.map((c) => ({ ...c }));
+  $('#app').innerHTML = shell(`
+    <h1>Playground <b>Menu Bot</b></h1>
+    <p class="sub">Atur command dan balasan bot, lalu coba langsung sebelum dipakai di WhatsApp.</p>
+    <div class="card"><h3>Command bot</h3>
+      <p style="color:var(--mut);font-size:13px;margin-bottom:12px">Gunakan <code class="g">@user</code> untuk menyebut pengirim pesan.</p>
+      <div id="list"></div>
+      <div class="row"><button class="btn ghost" id="add">+ Tambah command</button><button class="btn" id="save">Simpan</button></div></div>
+    <div class="card"><h3>Simulator chat</h3>
+      <div class="chat"><div class="msgs" id="msgs"><div class="m bot">Ketik command, misalnya .menu</div></div>
+      <form id="cf"><input id="ci" placeholder=".menu" autocomplete="off" autocapitalize="off"><button aria-label="Kirim">➤</button></form></div></div>
+    <div class="card"><h3>Katalog command bawaan</h3><div id="catalog" class="empty">Memuat...</div></div>`);
+  bindShell();
+  const list = $('#list');
+  const draw = () => {
+    list.innerHTML = cmds.map((c, i) => `<div class="cmd"><div class="h"><span>.</span><input class="mono" data-k="cmd" data-i="${i}" value="${esc(c.cmd)}" placeholder="nama"><button class="x" data-del="${i}" aria-label="Hapus">✕</button></div>
+      <textarea class="mono" data-k="reply" data-i="${i}" placeholder="Balasan bot">${esc(c.reply)}</textarea></div>`).join('') || '<div class="empty">Belum ada command. Tambahkan satu.</div>';
+    list.querySelectorAll('[data-k]').forEach((el) => (el.oninput = () => (cmds[el.dataset.i][el.dataset.k] = el.value)));
+    list.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => { cmds.splice(b.dataset.del, 1); draw(); }));
+  };
+  draw();
+  $('#add').onclick = () => { cmds.push({ cmd: '', reply: '' }); draw(); };
+  $('#save').onclick = async () => {
+    try { const d = await api('/app/commands', { method: 'PUT', body: { commands: cmds } }); cmds = d.commands; draw(); toast('Command disimpan'); } catch (e) { toast(e.message, true); }
+  };
+  api('/app/commands/catalog').then((d) => {
+    const by = {}; d.commands.forEach((c) => (by[c.catLabel] ||= []).push(c));
+    $('#catalog').className = '';
+    $('#catalog').innerHTML = Object.entries(by).map(([k, arr]) => `<p style="font-weight:700;margin:14px 0 6px">${esc(k)}</p>` + arr.map((c) =>
+      `<div class="kv" style="align-items:flex-start;gap:12px"><b class="mono g" style="flex:none">.${esc(c.name)}</b><span style="text-align:right;font-size:13px">${esc(c.desc)}${c.admin ? ' · admin' : ''}${c.owner ? ' · owner' : ''}${c.group ? ' · grup' : ''}</span></div>`).join('')).join('');
+  }).catch(() => {});
+  const bubble = (t, cls) => { const d = document.createElement('div'); d.className = 'm ' + cls; d.textContent = t; $('#msgs').append(d); $('#msgs').scrollTop = 1e9; };
+  $('#cf').onsubmit = async (e) => {
+    e.preventDefault(); const t = $('#ci').value.trim(); if (!t) return; $('#ci').value = ''; bubble(t, 'me');
+    try { const d = await api('/app/commands/test', { method: 'POST', body: { text: t, commands: cmds } }); bubble(d.reply ?? (t.startsWith('.') ? 'Command tidak ditemukan.' : 'Bot hanya membalas pesan yang diawali titik (.)'), 'bot'); }
+    catch (er) { bubble(er.message, 'bot'); }
+  };
+}
+
+async function pageGroups() {
+  me = await api('/app/me');
+  $('#app').innerHTML = shell(`
+    <h1>Setup <b>Grup</b></h1>
+    <p class="sub">Atur sambutan, perpisahan, dan antilink per grup dari bot yang sedang tersambung.</p>
+    <div class="card" id="gErr" style="display:none;border-color:#4a1d1d;color:#f87171"></div>
+    <div class="card"><h3>Pilih grup</h3><select id="gSel"><option>Memuat...</option></select>
+      <div class="cb" style="margin-top:14px;background:#0b1a11;border-color:#14532d">Placeholder pesan:<br><span class="g mono">@user</span> = nama / mention anggota<br><span class="g mono">@grup</span> = nama grup<br><span class="g mono">@desc</span> = deskripsi grup</div></div>
+    <div class="card" id="gSet"><div class="empty">Pilih grup terlebih dahulu.<br>Pengaturan muncul setelah grup dipilih.</div></div>`);
+  bindShell();
+  let gid = null;
+  const sel = $('#gSel');
+  try {
+    const d = await api('/app/groups');
+    sel.innerHTML = '<option value="">-- pilih grup --</option>' + d.groups.map((g) => `<option value="${esc(g.id)}">${esc(g.subject)} (${g.members})</option>`).join('');
+  } catch (e) { sel.innerHTML = '<option>Bot belum tersambung</option>'; const el = $('#gErr'); el.style.display = 'block'; el.textContent = e.message; return; }
+  sel.onchange = async () => {
+    gid = sel.value; if (!gid) return;
+    const g = await api('/app/groups/' + encodeURIComponent(gid));
+    const sw = (id, label, on) => `<div class="kv" style="align-items:center"><b>${label}</b><input type="checkbox" id="${id}" ${on ? 'checked' : ''} style="width:24px;height:24px;accent-color:var(--g)"></div>`;
+    $('#gSet').innerHTML = `<h3>Pengaturan grup</h3>${sw('gW', 'Welcome', g.welcome)}${sw('gB', 'Goodbye', g.goodbye)}${sw('gA', 'Antilink', g.antilink)}
+      <label>Pesan welcome</label><textarea id="gWm" class="mono">${esc(g.welcomeMsg)}</textarea>
+      <label>Pesan goodbye</label><textarea id="gBm" class="mono">${esc(g.goodbyeMsg)}</textarea>
+      <div style="height:16px"></div><button class="btn" id="gSave">Simpan pengaturan</button>
+      <p style="color:var(--mut);font-size:13px;margin-top:10px">Antilink dan keluarkan anggota butuh bot sebagai admin grup.</p>`;
+    $('#gSave').onclick = async () => {
+      try { await api('/app/groups/' + encodeURIComponent(gid), { method: 'PUT', body: { welcome: $('#gW').checked, goodbye: $('#gB').checked, antilink: $('#gA').checked, welcomeMsg: $('#gWm').value, goodbyeMsg: $('#gBm').value } }); toast('Pengaturan disimpan'); }
+      catch (e) { toast(e.message, true); }
+    };
+  };
+}
+
+
+async function pagePortfolio() {
+  const roles = ['Bot Developer', 'Web Developer', 'Automation Builder'];
+  const projects = [
+    ['🌩️', 'NAcodeCloud', 'Dashboard bot WhatsApp dan Telegram: pairing code, playground menu, setup grup, dan dokumentasi REST API.', ['Node.js', 'Baileys', 'Telegram Bot API'], 'linear-gradient(90deg,#22c55e,#7c8cff)'],
+    ['💬', 'Bot WhatsApp', 'Bot lewat QR atau pairing code dengan menu tombol, manajemen grup, game, tools, dan API pihak ketiga.', ['Baileys', 'Termux', 'REST API'], 'linear-gradient(90deg,#22c55e,#14b8a6)'],
+    ['✈️', 'Bot Telegram', 'Menu inline keyboard, ratusan command, limit harian, dan kontrol owner langsung dari chat.', ['Telegram', 'Inline Keyboard'], 'linear-gradient(90deg,#38bdf8,#7c8cff)'],
+    ['📱', 'APK Builder Web', 'Web pembangun APK Android versi HP: setup proyek, editor kode, dan build APK.', ['Web App', 'Android'], 'linear-gradient(90deg,#f5c542,#fb923c)'],
+    ['🪟', 'WhatsApp Web Clone', 'Tampilan mirip WhatsApp Web yang terhubung ke akun asli lewat QR dan kode pairing.', ['WebSocket', 'UI'], 'linear-gradient(90deg,#f472b6,#a78bfa)'],
+    ['🖥️', 'Panel Server', 'Panel web bergaya Pterodactyl: daftar server, konsol, start/stop, dan file manager.', ['Dashboard', 'Node.js'], 'linear-gradient(90deg,#ef4444,#f472b6)'],
+  ];
+  $('#app').innerHTML = `
+  <header class="top"><div class="logo"><i>N</i><span>NAcode<b>Cloud</b></span></div>
+    <a class="pill" href="#/${token ? 'dashboard' : 'login'}">${token ? 'Dashboard' : 'Masuk'}</a></header>
+  <section class="pf-hero"><i class="pf-orb a"></i><i class="pf-orb b"></i>
+    <div class="pf-av"><span>K</span></div>
+    <h1 class="pf-name">kamm<b>x</b></h1>
+    <div class="pf-role" id="pfRole"></div>
+    <p class="pf-bio">Pembuat bot WhatsApp dan Telegram. Membangun dashboard, API, dan otomasi yang bisa jalan langsung dari HP lewat Termux.</p>
+    <div class="pf-cta"><a class="p" href="https://wa.me/6282310257079?text=Halo%20kammx" target="_blank" rel="noopener">💬 Hubungi di WhatsApp</a><a class="s" href="#pfProj" id="toProj">Lihat proyek ↓</a></div>
+  </section>
+  <div class="pf-stats"><div><b id="stWa">–</b><small>command WhatsApp</small></div><div><b id="stTg">–</b><small>command Telegram</small></div><div><b id="stCat">–</b><small>kategori menu</small></div></div>
+  <h2 class="pf-h">Tentang</h2>
+  <div class="card"><p style="color:var(--mut)">Fokus saya membuat bot dan alat otomasi yang praktis dipakai: dari pairing WhatsApp asli, menu interaktif, sampai dokumentasi API untuk dipakai aplikasi lain. Semua proyek di sini dikerjakan sendiri oleh <b style="color:var(--txt)">kammx</b>.</p></div>
+  <h2 class="pf-h">Keahlian</h2>
+  <div class="pf-chips">${['Node.js', 'Baileys (WhatsApp)', 'Telegram Bot API', 'REST API', 'JavaScript', 'HTML & CSS', 'Termux', 'Vercel', 'Otomasi'].map((x) => `<span class="pf-chip">${x}</span>`).join('')}</div>
+  <h2 class="pf-h" id="pfProj">Proyek</h2>
+  <div class="pf-grid">${projects.map((p) => `<article class="pf-card" style="--acc:${p[4]}"><h3>${p[0]} ${esc(p[1])}</h3><p>${esc(p[2])}</p>${p[3].map((t) => `<span class="pf-tag">${esc(t)}</span>`).join('')}</article>`).join('')}</div>
+  <h2 class="pf-h">Kontak</h2>
+  <div class="pf-contact"><h2 style="font-size:22px;margin-bottom:6px">Ada pertanyaan atau mau buat bot?</h2><p style="color:var(--mut);margin-bottom:16px">Hubungi owner lewat WhatsApp, atau coba bot dengan mengetik <b class="mono g">.sapa</b>.</p>
+    <div class="pf-cta"><a class="p" href="https://wa.me/6282310257079?text=Halo%20kammx" target="_blank" rel="noopener">💬 Chat WhatsApp</a><a class="s" href="#/${token ? 'dashboard' : 'register'}">🚀 ${token ? 'Buka dashboard' : 'Buat akun NAcodeCloud'}</a></div></div>
+  <footer>© 2026 kammx · NAcodeCloud</footer>`;
+  $('#toProj').onclick = (e) => { e.preventDefault(); $('#pfProj').scrollIntoView({ behavior: 'smooth' }); };
+  // efek ketik peran
+  const el = $('#pfRole'); let ri = 0, ci = 0, del = false;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (still) el.textContent = roles.join(' · ');
+  else poll = setInterval(() => {
+    const w = roles[ri];
+    ci += del ? -1 : 1; el.textContent = w.slice(0, ci);
+    if (!del && ci === w.length) { del = true; ci = w.length + 8; }
+    else if (del && ci <= 0) { del = false; ri = (ri + 1) % roles.length; ci = 0; }
+    if (del && ci > w.length) el.textContent = w;
+  }, 90);
+  try {
+    const r = await fetch(API + '/public/stats'); const d = await r.json();
+    $('#stWa').textContent = d.waCommands; $('#stTg').textContent = d.tgCommands; $('#stCat').textContent = d.categories;
+  } catch {}
+}
+
+async function pageTelegram() {
+  me = await api('/app/me');
+  $('#app').innerHTML = shell(`
+    <h1>Bot <b>Telegram</b></h1>
+    <p class="sub">Hubungkan bot Telegram kamu. Menu tombol, ratusan command, dan limit harian langsung aktif.</p>
+    <div class="card"><h3>Status</h3>
+      <div class="tg-st"><span class="tg-dot" id="tgDot"></span><b id="tgSt">IDLE</b><span class="mono" id="tgUser" style="color:var(--mut)"></span></div>
+      <div class="kv"><span>Command tersedia</span><b id="tgCmd">-</b></div>
+      <div class="kv"><span>ID owner</span><b class="mono" id="tgOwner">-</b></div>
+      <div style="height:10px"></div><a class="btn ghost" id="tgOpen" style="display:none" target="_blank" rel="noopener">Buka bot di Telegram</a>
+      <div style="height:10px"></div><button class="btn ghost" id="tgOff" style="display:none">Putuskan bot</button></div>
+    <div class="card"><h3>Hubungkan bot</h3>
+      <label for="tgToken" style="margin-top:0">Token bot <small>(dari @BotFather → /newbot)</small></label>
+      <div class="keybox"><input id="tgToken" class="mono" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="123456789:AAH..."><button type="button" id="tgEye" aria-label="Tampilkan token">👁</button></div>
+      <label for="tgOwnerIn">ID Telegram owner <small>(angka, cek lewat @userinfobot)</small></label>
+      <input id="tgOwnerIn" class="mono" inputmode="numeric" autocomplete="off" placeholder="123456789">
+      <p class="hint">Owner bisa memakai command khusus owner dan tidak kena limit. Token disimpan di server kamu sendiri (Termux).</p>
+      <div style="height:14px"></div><button class="btn" id="tgGo">HUBUNGKAN BOT</button></div>
+    <div class="term"><div class="hd"><span class="dot" style="background:#c0392b"></span><span class="dot" style="background:#27ae60"></span><span class="mono">log_telegram</span></div>
+      <pre class="mono" id="tgLog" style="border-top:0"># Menunggu koneksi...</pre></div>`);
+  bindShell();
+  $('#tgEye').onclick = () => { const t = $('#tgToken'); t.type = t.type === 'password' ? 'text' : 'password'; };
+  $('#tgGo').onclick = async () => {
+    const b = $('#tgGo'); b.disabled = true; b.textContent = 'Menghubungkan...';
+    try {
+      const d = await api('/app/tg/connect', { method: 'POST', body: { token: $('#tgToken').value.trim(), ownerId: $('#tgOwnerIn').value.trim() } });
+      $('#tgToken').value = ''; toast('Terhubung sebagai @' + d.username); tick();
+    } catch (e) { toast(e.message, true); }
+    b.disabled = false; b.textContent = 'HUBUNGKAN BOT';
+  };
+  $('#tgOff').onclick = async () => {
+    if (!confirm('Putuskan bot Telegram dan hapus token tersimpan?')) return;
+    try { await api('/app/tg/disconnect', { method: 'POST' }); toast('Bot diputuskan'); tick(); } catch (e) { toast(e.message, true); }
+  };
+  async function tick() {
+    try {
+      const s = await api('/app/tg/status');
+      $('#tgDot').className = 'tg-dot ' + s.status; $('#tgSt').textContent = s.status.toUpperCase();
+      $('#tgUser').textContent = s.username ? '@' + s.username : '';
+      $('#tgCmd').textContent = s.commands || '-'; $('#tgOwner').textContent = s.ownerId || '-';
+      const open = $('#tgOpen'); open.style.display = s.username ? 'flex' : 'none'; if (s.username) open.href = 'https://t.me/' + s.username;
+      $('#tgOff').style.display = s.status === 'idle' && !s.saved ? 'none' : 'flex';
+      $('#tgLog').textContent = s.logs?.length ? s.logs.join('\n') : '# Menunggu koneksi...';
+    } catch {}
+  }
+  tick(); poll = setInterval(tick, 3000);
+}
+
+async function pageProfile() {
+  me = await api('/app/me');
+  $('#app').innerHTML = shell(`
+    <h1>Akun <b>Saya</b></h1><p class="sub">Informasi akun dan keamanan.</p>
+    <div class="card" style="text-align:center"><div class="av" style="margin:0 auto 12px;width:90px;height:90px;font-size:40px">${esc(me.name[0].toUpperCase())}</div>
+      <h2>${esc(me.name)}</h2><b class="g" style="font-size:13px;letter-spacing:1px">${esc(me.plan.toUpperCase())} MEMBER</b></div>
+    <div class="card"><h3>Email</h3><b>${esc(me.email)}</b></div>
+    <div class="card"><h3>Berlaku sampai</h3><b>${new Date(me.expiresAt).toLocaleDateString('id-ID')}</b></div>`);
+  bindShell();
+}
+
+/* ---------- router ---------- */
+async function route() {
+  clearInterval(poll);
+  const r = (location.hash.replace('#/', '') || 'dashboard');
+  if (r === 'portfolio') { window.scrollTo(0, 0); return pagePortfolio(); }
+  if (!token && r !== 'register') return pageAuth('login');
+  if (token && (r === 'login' || r === 'register')) return (location.hash = '#/dashboard');
+  if (r === 'register') return pageAuth('register');
+  try {
+    if (r === 'api-docs') await pageDocs();
+    else if (r === 'playground') await pagePlayground();
+    else if (r === 'groups') await pageGroups();
+    else if (r === 'telegram') await pageTelegram();
+    else if (r === 'profile') await pageProfile();
+    else await pageDashboard();
+    window.scrollTo(0, 0);
+  } catch (e) { if (token) { $('#app').innerHTML = `<div class="card empty">${esc(e.message)}<div style="height:14px"></div><button class="btn ghost" onclick="route()">Coba lagi</button></div>`; } }
+}
+addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
